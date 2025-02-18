@@ -1,12 +1,17 @@
+![App Screenshot](screenshot.png) <!-- Add a screenshot later -->
+
 # G5MT
 Grade 5 Musical Terms: An Application for you to practice all necessary musical terms to prepare for ABRSM Grade 5 Theoretical Exam.
 
-# Main Functionalities
-- 135 terms in total
-- full test
-- test by parts
-- test histories
-- view dictionary
-- basic theme settings
-- basic sound settings
-- basic GUI
+## Features
+- Complete test mode with randomized questions
+- Thematic breakdown of musical terms (Tempo, Dynamics, Articulation, etc.)
+- Sound feedback for correct/incorrect answers
+- Dark/Light theme support
+- Test history tracking
+- No internet connection required
+- 100% free and open source
+
+## Installation
+1. Unzip folder
+2. Run G5MT.exe
