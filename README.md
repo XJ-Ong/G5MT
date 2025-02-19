@@ -15,5 +15,8 @@ Grade 5 Musical Terms: An Application for you to practice all necessary musical 
 - 100% free and open source
 
 ## Installation
+
+###Open Source Code
 1. Unzip folder
-2. Run G5MT.exe
+2. Make sure main.py is together with resource folder
+3. Install pygame via cmd "pip install pygame==2.0.1"
