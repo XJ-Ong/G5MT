@@ -1,4 +1,4 @@
-![App Icon](icon.ico) <!-- Add a screenshot later -->
+![App Icon](icon.svg) <!-- Add a screenshot later -->
 
 # G5MT
 A personal project built for fun and for my own personal use
@@ -67,8 +67,10 @@ pip install -r requirements.txt
 4. Keep the `data` folder in the same directory
 
 
-## License
-BSD 3-Clause "No Commercial Use" License - see [LICENSE](LICENSE) for details
+## Licensing
+- **Source Code**: Licensed under MIT License  
+- **Compiled Releases**: All rights reserved  
+  - No redistribution/modification of executables allowed
 
 
 ## Credits
