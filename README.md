@@ -20,6 +20,6 @@ Grade 5 Musical Terms: An Application for you to practice all necessary musical 
 1. Unzip folder
 2. Make sure main.py is together with resource folder
 3. Install Python 3.8.10 [here](https://www.python.org/downloads/release/python-3810/)
-4. Install pygame via `cmd pip install -r requirements.txt`
-🔹 **Output:**  
-Install pygame via cmd:  
+4. Install pygame via cmd:
+```sh
+pip install -r requirements.txt
