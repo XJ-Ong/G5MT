@@ -5,27 +5,23 @@ from tkinter import messagebox, simpledialog
 import pygame
 from datetime import datetime
 import os
-from resource_manager import resource_manager
 
-CONFIG_FILE = "app_config.enc"
+CONFIG_FILE = "app_config.json"
 
 def load_json_files():
     json_files = {
-        "dictionary": "dictionary.enc",
-        "tempo": "tempo.enc",
-        "expression": "expression.enc",
-        "dynamics": "dynamics.enc",
-        "general": "general.enc",
-        "articulation": "articulation.enc",
-        "signs": "signs.enc"
+        "dictionary": "dictionary.json",
+        "tempo": "tempo.json",
+        "expression": "expression.json",
+        "dynamics": "dynamics.json",
+        "general": "general.json",
+        "articulation": "articulation.json",
+        "signs": "signs.json"
     }
     data = {}
     for key, file_name in json_files.items():
-        json_str = resource_manager.decrypt_file(file_name)
-        try:
-            data[key] = json.loads(json_str)
-        except json.JSONDecodeError:
-            data[key] = {}
+        with open(file_name, 'r', encoding='utf-8') as file:
+            data[key] = json.load(file)
     return data
 
 class App:                          
@@ -57,12 +53,12 @@ class App:
         self.correct_volume = tk.DoubleVar(value=1.0)
         self.incorrect_volume = tk.DoubleVar(value=1.0)
         self.typing_volume = tk.DoubleVar(value=1.0)
-        self.click_sound = pygame.mixer.Sound(resource_manager.decrypt_file("click.enc"))
-        self.correct_sound = pygame.mixer.Sound(resource_manager.decrypt_file("correct.enc"))
-        self.wrong_sound = pygame.mixer.Sound(resource_manager.decrypt_file("wrong.enc"))
-        self.typing_sound = pygame.mixer.Sound(resource_manager.decrypt_file("keytype.enc"))
-        self.backspace_sound = pygame.mixer.Sound(resource_manager.decrypt_file("backspace.enc"))
-        self.space_sound = pygame.mixer.Sound(resource_manager.decrypt_file("spacebar.enc"))
+        self.click_sound = pygame.mixer.Sound("click.wav")
+        self.correct_sound = pygame.mixer.Sound("correct.wav")
+        self.wrong_sound = pygame.mixer.Sound("wrong.wav")
+        self.typing_sound = pygame.mixer.Sound("keytype.wav")
+        self.backspace_sound = pygame.mixer.Sound("backspace.wav")
+        self.space_sound = pygame.mixer.Sound("spacebar.wav")
 
     def play_click_sound(self):
         volume = self.click_volume.get() * self.master_volume.get()
@@ -191,7 +187,7 @@ class App:
         ).pack(pady=5, expand=True)
         self.create_button(
             self.main_menu_frame, 
-            text="Test History",
+            text="Test History", 
             command=self.view_test_history, 
             width=30, 
             font=("Times", 16), 
@@ -402,32 +398,49 @@ class App:
         self.incorrect_volume = tk.DoubleVar(value=1.0)
         self.typing_volume = tk.DoubleVar(value=1.0)
         try:
+            if os.path.exists('app_settings.json'):
+                with open('app_settings.json', 'r') as f:
+                    old_data = json.load(f)
+                    if 'history' in old_data:
+                        config_data['test_history'] = old_data['history']
+                    config_data.update({
+                        'theme': old_data.get('theme', 'dark'),
+                        'master_volume': old_data.get('master_volume', 1.0),
+                        'click_volume': old_data.get('click_volume', 1.0),
+                        'correct_volume': old_data.get('correct_volume', 1.0),
+                        'incorrect_volume': old_data.get('incorrect_volume', 1.0),
+                        'typing_volume': old_data.get('typing_volume', 1.0)
+                    })
+                    with open(CONFIG_FILE, 'w') as new_f:
+                        json.dump(config_data, new_f)
+                os.remove('app_settings.json')
+            if os.path.exists('test_history.txt'):
+                with open('test_history.txt', 'r') as f:
+                    history_data = json.load(f)
+                if os.path.exists(CONFIG_FILE):
+                    with open(CONFIG_FILE, 'r') as f:
+                        config_data = json.load(f)
+                    config_data['test_history'] = history_data
+                    with open(CONFIG_FILE, 'w') as f:
+                        json.dump(config_data, f)
+                os.remove('test_history.txt')
             if os.path.exists(CONFIG_FILE):
-                config_data = resource_manager.decrypt_file(CONFIG_FILE)
-                config = json.loads(config_data)
-                if config.get('theme') == 'light':
-                    self.apply_light_theme()
-                    self.is_dark_theme = False
-                else:
-                    self.apply_dark_theme()
-                    self.is_dark_theme = True
-                self.master_volume.set(float(config.get('master_volume', 1.0)))
-                self.click_volume.set(float(config.get('click_volume', 1.0)))
-                self.correct_volume.set(float(config.get('correct_volume', 1.0)))
-                self.incorrect_volume.set(float(config.get('incorrect_volume', 1.0)))
-                self.typing_volume.set(float(config.get('typing_volume', 1.0)))
-
-            if os.path.exists('test_history.enc'):
-                history_data = resource_manager.decrypt_file('test_history.enc')
-                if history_data.strip():
-                    self.test_history = json.loads(history_data)
-                else:
-                    self.test_history = []
+                with open(CONFIG_FILE, 'r') as f:
+                    config = json.load(f)
+                    if config.get('theme') == 'light':
+                        self.apply_light_theme()
+                        self.is_dark_theme = False
+                    self.master_volume.set(config.get('master_volume', 1.0))
+                    self.click_volume.set(config.get('click_volume', 1.0))
+                    self.correct_volume.set(config.get('correct_volume', 1.0))
+                    self.incorrect_volume.set(config.get('incorrect_volume', 1.0))
+                    self.typing_volume.set(config.get('typing_volume', 1.0))
+            if 'test_history' in config:
+                self.test_history = config['test_history']
             else:
                 self.test_history = []
-
         except Exception as e:
-            print(f"Error loading data: {str(e)}")
+            print(f"Error loading data: {e}")
             self.test_history = []
 
     def save_test_history(self):
@@ -437,19 +450,14 @@ class App:
             'click_volume': self.click_volume.get(),
             'correct_volume': self.correct_volume.get(),
             'incorrect_volume': self.incorrect_volume.get(),
-            'typing_volume': self.typing_volume.get()
+            'typing_volume': self.typing_volume.get(),
+            'test_history': self.test_history
         }
         try:
             with open(CONFIG_FILE, 'w') as file:
                 json.dump(config_data, file)
         except Exception as e:
             print(f"Error saving config: {e}")
-        
-        try:
-            with open('test_history.enc', 'wb') as file:
-                json.dump(self.test_history, file)
-        except Exception as e:
-            print(f"Error saving history: {e}")
 
     def show_settings_menu(self):
         self.original_volumes = {
@@ -466,36 +474,27 @@ class App:
         self.clear_window()
         tk.Label(self.root, text="Settings", font=("Times", 24), 
                 bg=self.root['bg'], fg=self.label_fg).pack(pady=10)
-        
         volume_frame = tk.Frame(self.root, bg=self.root['bg'])
         volume_frame.pack(pady=10)
-
         tk.Label(volume_frame, text="Master Volume:", bg=self.root['bg'], fg=self.label_fg).grid(row=0, column=0, sticky='w')
         tk.Scale(volume_frame, from_=0.0, to=1.0, resolution=0.1, orient='horizontal',
                 variable=self.master_volume, bg=self.root['bg'], fg=self.label_fg).grid(row=0, column=1, padx=10)
-
         tk.Label(volume_frame, text="Button Clicks:", bg=self.root['bg'], fg=self.label_fg).grid(row=1, column=0, sticky='w')
         tk.Scale(volume_frame, from_=0.0, to=1.0, resolution=0.1, orient='horizontal',
                 variable=self.click_volume, bg=self.root['bg'], fg=self.label_fg).grid(row=1, column=1, padx=10)
-
         tk.Label(volume_frame, text="Correct Sounds:", bg=self.root['bg'], fg=self.label_fg).grid(row=2, column=0, sticky='w')
         tk.Scale(volume_frame, from_=0.0, to=1.0, resolution=0.1, orient='horizontal',
                 variable=self.correct_volume, bg=self.root['bg'], fg=self.label_fg).grid(row=2, column=1, padx=10)
-
         tk.Label(volume_frame, text="Incorrect Sounds:", bg=self.root['bg'], fg=self.label_fg).grid(row=3, column=0, sticky='w')
         tk.Scale(volume_frame, from_=0.0, to=1.0, resolution=0.1, orient='horizontal',
                 variable=self.incorrect_volume, bg=self.root['bg'], fg=self.label_fg).grid(row=3, column=1, padx=10)
-
         tk.Label(volume_frame, text="Typing Sounds:", bg=self.root['bg'], fg=self.label_fg).grid(row=4, column=0, sticky='w')
         tk.Scale(volume_frame, from_=0.0, to=1.0, resolution=0.1, orient='horizontal',
                 variable=self.typing_volume, bg=self.root['bg'], fg=self.label_fg).grid(row=4, column=1, padx=10)
-
         button_frame = tk.Frame(self.root, bg=self.root['bg'])
         button_frame.pack(pady=20)
-        
         self.create_button(button_frame, text="Save", command=self.save_settings,
                           width=15, font=("Times", 14), bg="#4CAF50", fg="white").pack(side='left', padx=10)
-        
         self.create_button(button_frame, text="Cancel", command=self.cancel_settings,
                           width=15, font=("Times", 14), bg="#f44336", fg="white").pack(side='left', padx=10)
 
