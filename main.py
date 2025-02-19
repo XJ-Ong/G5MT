@@ -9,14 +9,15 @@ import os
 CONFIG_FILE = "app_config.json"
 
 def load_json_files():
+    """Load and return all JSON data files from resource directory"""
     json_files = {
-        "dictionary": "dictionary.json",
-        "tempo": "tempo.json",
-        "expression": "expression.json",
-        "dynamics": "dynamics.json",
-        "general": "general.json",
-        "articulation": "articulation.json",
-        "signs": "signs.json"
+        "dictionary": "resource/dictionary.json",
+        "tempo": "resource/tempo.json",
+        "expression": "resource/expression.json", 
+        "dynamics": "resource/dynamics.json",
+        "general": "resource/general.json",
+        "articulation": "resource/articulation.json",
+        "signs": "resource/signs.json"
     }
     data = {}
     for key, file_name in json_files.items():
@@ -24,8 +25,9 @@ def load_json_files():
             data[key] = json.load(file)
     return data
 
-class App:                          
+class App:
     def __init__(self, root):
+        """Main application class constructor"""
         self.root = root
         self.setup_window()
         self.initialize_sound()
@@ -47,18 +49,19 @@ class App:
         self.root.geometry(f"{window_width}x{window_height}+{x_coordinate}+{y_coordinate}")
 
     def initialize_sound(self):
+        """Initialize audio system and load sound effects"""
         pygame.mixer.init()
         self.master_volume = tk.DoubleVar(value=1.0)
         self.click_volume = tk.DoubleVar(value=1.0)
         self.correct_volume = tk.DoubleVar(value=1.0)
         self.incorrect_volume = tk.DoubleVar(value=1.0)
         self.typing_volume = tk.DoubleVar(value=1.0)
-        self.click_sound = pygame.mixer.Sound("click.wav")
-        self.correct_sound = pygame.mixer.Sound("correct.wav")
-        self.wrong_sound = pygame.mixer.Sound("wrong.wav")
-        self.typing_sound = pygame.mixer.Sound("keytype.wav")
-        self.backspace_sound = pygame.mixer.Sound("backspace.wav")
-        self.space_sound = pygame.mixer.Sound("spacebar.wav")
+        self.click_sound = pygame.mixer.Sound("resource/click.wav")
+        self.correct_sound = pygame.mixer.Sound("resource/correct.wav")
+        self.wrong_sound = pygame.mixer.Sound("resource/wrong.wav")
+        self.typing_sound = pygame.mixer.Sound("resource/keytype.wav")
+        self.backspace_sound = pygame.mixer.Sound("resource/backspace.wav")
+        self.space_sound = pygame.mixer.Sound("resource/spacebar.wav")
 
     def play_click_sound(self):
         volume = self.click_volume.get() * self.master_volume.get()
@@ -397,48 +400,46 @@ class App:
         self.correct_volume = tk.DoubleVar(value=1.0)
         self.incorrect_volume = tk.DoubleVar(value=1.0)
         self.typing_volume = tk.DoubleVar(value=1.0)
+        
+        config = {}  # Initialize config
         try:
+            config_data = {}
+            
             if os.path.exists('app_settings.json'):
                 with open('app_settings.json', 'r') as f:
                     old_data = json.load(f)
-                    if 'history' in old_data:
-                        config_data['test_history'] = old_data['history']
-                    config_data.update({
+                    config_data = {
                         'theme': old_data.get('theme', 'dark'),
                         'master_volume': old_data.get('master_volume', 1.0),
                         'click_volume': old_data.get('click_volume', 1.0),
                         'correct_volume': old_data.get('correct_volume', 1.0),
                         'incorrect_volume': old_data.get('incorrect_volume', 1.0),
-                        'typing_volume': old_data.get('typing_volume', 1.0)
-                    })
-                    with open(CONFIG_FILE, 'w') as new_f:
-                        json.dump(config_data, new_f)
+                        'typing_volume': old_data.get('typing_volume', 1.0),
+                        'test_history': old_data.get('history', [])
+                    }
                 os.remove('app_settings.json')
-            if os.path.exists('test_history.txt'):
-                with open('test_history.txt', 'r') as f:
-                    history_data = json.load(f)
-                if os.path.exists(CONFIG_FILE):
-                    with open(CONFIG_FILE, 'r') as f:
-                        config_data = json.load(f)
-                    config_data['test_history'] = history_data
-                    with open(CONFIG_FILE, 'w') as f:
-                        json.dump(config_data, f)
-                os.remove('test_history.txt')
+                with open(CONFIG_FILE, 'w') as new_f:
+                    json.dump(config_data, new_f)
+
             if os.path.exists(CONFIG_FILE):
                 with open(CONFIG_FILE, 'r') as f:
                     config = json.load(f)
-                    if config.get('theme') == 'light':
-                        self.apply_light_theme()
-                        self.is_dark_theme = False
-                    self.master_volume.set(config.get('master_volume', 1.0))
-                    self.click_volume.set(config.get('click_volume', 1.0))
-                    self.correct_volume.set(config.get('correct_volume', 1.0))
-                    self.incorrect_volume.set(config.get('incorrect_volume', 1.0))
-                    self.typing_volume.set(config.get('typing_volume', 1.0))
-            if 'test_history' in config:
-                self.test_history = config['test_history']
+                
+            if config.get('theme') == 'light':
+                self.apply_light_theme()
+                self.is_dark_theme = False
             else:
-                self.test_history = []
+                self.apply_dark_theme()
+                self.is_dark_theme = True
+                
+            self.master_volume.set(config.get('master_volume', 1.0))
+            self.click_volume.set(config.get('click_volume', 1.0))
+            self.correct_volume.set(config.get('correct_volume', 1.0))
+            self.incorrect_volume.set(config.get('incorrect_volume', 1.0))
+            self.typing_volume.set(config.get('typing_volume', 1.0))
+            
+            self.test_history = config.get('test_history', [])
+
         except Exception as e:
             print(f"Error loading data: {e}")
             self.test_history = []
