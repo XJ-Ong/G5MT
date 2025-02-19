@@ -6,7 +6,7 @@ import pygame
 from datetime import datetime
 import os
 
-CONFIG_FILE = "app_config.json"
+CONFIG_FILE = "resource/app_config.json"
 
 def load_json_files():
     """Load and return all JSON data files from resource directory"""
