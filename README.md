@@ -1,4 +1,4 @@
-![App Icon](icon.png) <!-- Add a screenshot later -->
+![App Icon](icon.ico) <!-- Add a screenshot later -->
 
 # G5MT
 A personal project built for fun and for my own personal use
@@ -59,6 +59,12 @@ Always download from the [official repository](https://github.com/XJ-Ong/G5MT) t
 ```sh
 pip install -r requirements.txt
 ```
+
+## 🚀 Quick Start (For Executable)
+1. Download latest release from [Releases page](https://github.com/XJ-Ong/G5MT/releases)
+2. Extract zip file
+3. Run `G5MT.exe`
+4. Keep the `data` folder in the same directory
 
 
 ## License
