@@ -74,4 +74,6 @@ pip install -r requirements.txt
 
 
 ## Credits
-Developed by [XJ Ong](https://github.com/XJ-Ong)
+- ABRSM Grade 5 Theory Syllabus
+- Sound effects from [Pixabay](https://pixabay.com/)
+- Icon by [FlatIcon](https://www.flaticon.com/)
