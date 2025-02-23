@@ -3,7 +3,7 @@
     <h1>G5MT</h1>
 </div>
 
-A personal project built for fun and for my own personal use
+A personal project built for fun and for my own personal use.
 
 Grade 5 Musical Terms: An Application for you to practice all necessary musical terms to prepare for ABRSM Grade 5 Theoretical Exam.
 
